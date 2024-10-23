@@ -3,26 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>簡易文字樣式設定器 V4</title>
+    <title>簡易文字樣式設定器 V5</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Quill CSS CDN -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <style>
-        /* 自訂樣式 */
-        .ql-editor .background-span {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            border-radius: 0.25rem; /* Tailwind's rounded */
+        /* 自訂樣式：為包含背景顏色的 span 添加圓角、內邊距和間隔 */
+        .ql-editor span[style*="background-color"] {
+            border-radius: 0.25rem; /* Tailwind 的 rounded */
+            padding: 0 0.2rem; /* 左右內邊距 */
+            margin: 0 0.1rem; /* 左右間距 */
+            display: inline-block; /* 允許 margin 和 padding 生效 */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 輕微陰影以凸顯背景色 */
+        }
+
+        /* 調整預覽區的樣式，確保圓角和間距生效 */
+        #preview span[style*="background-color"] {
+            border-radius: 0.25rem;
             padding: 0 0.2rem;
             margin: 0 0.1rem;
             display: inline-block;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        /* 隱藏 Quill 的預設背景色 */
-        .ql-editor .ql-background {
-            background-color: transparent;
+        /* 可選：調整行高以避免行間距過大 */
+        .ql-editor, #preview {
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -91,8 +98,8 @@
         boldBtn.addEventListener('click', () => {
             const range = quill.getSelection();
             if (range) {
-                const currentFormat = quill.getFormat(range);
-                quill.format('bold', !currentFormat.bold);
+                const isBold = quill.getFormat(range).bold;
+                quill.format('bold', !isBold);
                 updateOutput();
             }
         });
@@ -110,38 +117,6 @@
             quill.format('background', color);
             updateOutput();
         });
-
-        // 自訂 Quill Blot 以添加圓角和間距
-        const Inline = Quill.import('blots/inline');
-
-        class BackgroundBlot extends Inline {
-            static create(value) {
-                let node = super.create();
-                node.setAttribute('data-bg-color', value);
-                node.classList.add('background-span');
-                node.style.setProperty('--bg-color', value);
-                return node;
-            }
-
-            static formats(node) {
-                return node.getAttribute('data-bg-color');
-            }
-
-            format(name, value) {
-                if (name === 'background' && value) {
-                    this.domNode.setAttribute('data-bg-color', value);
-                    this.domNode.style.setProperty('--bg-color', value);
-                } else {
-                    super.format(name, value);
-                }
-            }
-        }
-
-        BackgroundBlot.blotName = 'background';
-        BackgroundBlot.tagName = 'span';
-        BackgroundBlot.className = 'background-span';
-
-        Quill.register(BackgroundBlot, true);
 
         // 更新預覽和 HTML 原始碼
         function updateOutput() {
