@@ -7,7 +7,10 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 自訂樣式（如有需要） */
+        /* 為包含背景顏色的 span 添加圓角 */
+        #textInput span, #preview span {
+            border-radius: 0.25rem; /* 相當於 Tailwind 的 rounded */
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
@@ -62,7 +65,26 @@
 
         // 更新預覽和 HTML 原始碼
         function updateOutput() {
-            preview.innerHTML = textInput.innerHTML;
+            // 克隆 textInput 的內容以避免修改原始內容
+            const clonedContent = textInput.innerHTML;
+
+            // 創建一個臨時的 DOM 元素來處理圓角
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = clonedContent;
+
+            // 為所有包含背景顏色的 span 添加圓角
+            const spans = tempDiv.querySelectorAll('span[style*="background-color"]');
+            spans.forEach(span => {
+                // 檢查是否已經有 border-radius，避免重複添加
+                if (!span.style.borderRadius) {
+                    span.style.borderRadius = '0.25rem'; // Tailwind 的 rounded 對應的值
+                }
+            });
+
+            // 設定預覽內容
+            preview.innerHTML = tempDiv.innerHTML;
+
+            // 設定 HTML 原始碼
             htmlOutput.value = preview.innerHTML;
         }
 
