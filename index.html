@@ -3,13 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>簡易文字樣式設定器</title>
+    <title>簡易文字樣式設定器 V3</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 為包含背景顏色的 span 添加圓角 */
+        /* 為包含背景顏色的 span 添加圓角、內邊距和間隔 */
         #textInput span, #preview span {
             border-radius: 0.25rem; /* 相當於 Tailwind 的 rounded */
+            padding: 0 0.2rem; /* 左右內邊距 */
+            margin: 0 0.1rem; /* 左右間距 */
+            display: inline-block; /* 允許 margin 和 padding 生效 */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 輕微陰影以凸顯背景色 */
+        }
+
+        /* 可選：調整行高以避免行間距過大 */
+        #textInput, #preview {
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -68,17 +77,22 @@
             // 克隆 textInput 的內容以避免修改原始內容
             const clonedContent = textInput.innerHTML;
 
-            // 創建一個臨時的 DOM 元素來處理圓角
+            // 創建一個臨時的 DOM 元素來處理圓角和間距
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = clonedContent;
 
-            // 為所有包含背景顏色的 span 添加圓角
+            // 為所有包含背景顏色的 span 添加圓角、內邊距和間距
             const spans = tempDiv.querySelectorAll('span[style*="background-color"]');
             spans.forEach(span => {
                 // 檢查是否已經有 border-radius，避免重複添加
                 if (!span.style.borderRadius) {
                     span.style.borderRadius = '0.25rem'; // Tailwind 的 rounded 對應的值
                 }
+                // 添加內邊距和間距
+                span.style.padding = '0 0.2rem';
+                span.style.margin = '0 0.1rem';
+                span.style.display = 'inline-block';
+                span.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
             });
 
             // 設定預覽內容
