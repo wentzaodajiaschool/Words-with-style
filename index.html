@@ -3,28 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>簡易文字樣式設定器 V5</title>
+    <title>簡易文字樣式設定器 V6</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Quill CSS CDN -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <style>
         /* 自訂樣式：為包含背景顏色的 span 添加圓角、內邊距和間隔 */
-        .ql-editor span[style*="background-color"] {
-            border-radius: 0.25rem; /* Tailwind 的 rounded */
-            padding: 0 0.2rem; /* 左右內邊距 */
-            margin: 0 0.1rem; /* 左右間距 */
-            display: inline-block; /* 允許 margin 和 padding 生效 */
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 輕微陰影以凸顯背景色 */
-        }
-
-        /* 調整預覽區的樣式，確保圓角和間距生效 */
-        #preview span[style*="background-color"] {
-            border-radius: 0.25rem;
-            padding: 0 0.2rem;
-            margin: 0 0.1rem;
-            display: inline-block;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        /* 這裡的樣式僅用於預覽區域，HTML 原始碼將包含內聯樣式 */
+        #preview span {
+            /* 這些樣式將被 JavaScript 添加為內聯樣式 */
         }
 
         /* 可選：調整行高以避免行間距過大 */
@@ -122,14 +110,38 @@
         function updateOutput() {
             const html = quill.root.innerHTML;
 
-            // 清理 Quill 的空標籤
-            const cleanedHtml = html.replace(/<p><br><\/p>/g, '');
+            // 使用 DOMParser 解析 HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // 處理所有帶有背景顏色的 span，添加圓角、內縮、間隔和陰影
+            const spans = doc.querySelectorAll('span[style*="background-color"]');
+            spans.forEach(span => {
+                // 獲取現有的 style 屬性
+                let style = span.getAttribute('style') || '';
+
+                // 添加圓角、內縮、間隔和陰影
+                style += ' border-radius: 0.25rem;';
+                style += ' padding: 0 0.2rem;';
+                style += ' margin: 0 0.1rem;';
+                style += ' display: inline-block;';
+                style += ' box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);';
+
+                // 更新 style 屬性
+                span.setAttribute('style', style);
+            });
+
+            // 序列化處理後的 HTML
+            const serializer = new XMLSerializer();
+            const processedHtml = serializer.serializeToString(doc.body);
 
             // 更新預覽區
-            preview.innerHTML = cleanedHtml;
+            preview.innerHTML = processedHtml;
 
             // 更新 HTML 原始碼區
-            htmlOutput.value = cleanedHtml;
+            // 移除 <body> 標籤
+            const cleanHtml = processedHtml.replace(/^<body[^>]*>/, '').replace(/<\/body>$/, '');
+            htmlOutput.value = cleanHtml;
         }
 
         // 監聽編輯器內容變化
