@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簡易文字樣式設定器</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 自訂樣式（如有需要） */
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-3xl">
+        <h1 class="text-2xl font-bold mb-4 text-center">簡易文字樣式設定器</h1>
+        
+        <!-- 文字輸入區 -->
+        <div class="mb-4">
+            <label for="textInput" class="block text-gray-700 mb-2">輸入您的文字：</label>
+            <div id="textInput" contenteditable="true" class="border border-gray-300 rounded p-2 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-blue-500"></div>
+        </div>
+        
+        <!-- 樣式設定工具列 -->
+        <div class="mb-4 flex space-x-4">
+            <div>
+                <label class="block text-gray-700 mb-1">粗體</label>
+                <button id="boldBtn" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">B</button>
+            </div>
+            <div>
+                <label class="block text-gray-700 mb-1">文字顏色</label>
+                <input type="color" id="textColorPicker" class="w-12 h-10 p-0 border-none">
+            </div>
+            <div>
+                <label class="block text-gray-700 mb-1">背景顏色</label>
+                <input type="color" id="bgColorPicker" class="w-12 h-10 p-0 border-none">
+            </div>
+        </div>
+        
+        <!-- 顯示效果 -->
+        <div class="mb-4">
+            <h2 class="text-xl font-semibold mb-2">顯示效果：</h2>
+            <div id="preview" class="border border-gray-300 rounded p-4 min-h-[100px] bg-gray-50"></div>
+        </div>
+        
+        <!-- HTML 原始碼顯示與複製按鈕 -->
+        <div class="mb-4">
+            <h2 class="text-xl font-semibold mb-2">HTML 原始碼：</h2>
+            <textarea id="htmlOutput" class="w-full border border-gray-300 rounded p-2 min-h-[100px] bg-gray-50" readonly></textarea>
+            <button id="copyBtn" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">一鍵複製</button>
+        </div>
+    </div>
+
+    <!-- JavaScript 部分 -->
+    <script>
+        const textInput = document.getElementById('textInput');
+        const boldBtn = document.getElementById('boldBtn');
+        const textColorPicker = document.getElementById('textColorPicker');
+        const bgColorPicker = document.getElementById('bgColorPicker');
+        const preview = document.getElementById('preview');
+        const htmlOutput = document.getElementById('htmlOutput');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // 更新預覽和 HTML 原始碼
+        function updateOutput() {
+            preview.innerHTML = textInput.innerHTML;
+            htmlOutput.value = preview.innerHTML;
+        }
+
+        // 監聽輸入區變化
+        textInput.addEventListener('input', updateOutput);
+
+        // 粗體按鈕功能
+        boldBtn.addEventListener('click', () => {
+            document.execCommand('bold');
+            updateOutput();
+        });
+
+        // 文字顏色改變
+        textColorPicker.addEventListener('input', () => {
+            const color = textColorPicker.value;
+            document.execCommand('foreColor', false, color);
+            updateOutput();
+        });
+
+        // 背景顏色改變
+        bgColorPicker.addEventListener('input', () => {
+            const color = bgColorPicker.value;
+            document.execCommand('hiliteColor', false, color);
+            updateOutput();
+        });
+
+        // 一鍵複製功能
+        copyBtn.addEventListener('click', () => {
+            htmlOutput.select();
+            htmlOutput.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand('copy');
+            copyBtn.textContent = '已複製!';
+            setTimeout(() => {
+                copyBtn.textContent = '一鍵複製';
+            }, 2000);
+        });
+
+        // 初始化預覽和 HTML 原始碼
+        updateOutput();
+    </script>
+</body>
+</html>
